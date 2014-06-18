@@ -1,0 +1,38 @@
+<html><head>
+<link rel="stylesheet" type="text/css" href="http://localhost/orgever2/test.css"> 
+</head>
+<body>
+<div class="test_form">
+<p><b><u>Literal Tests</b></u></p>
+<form action="http://localhost/orgever2/index.php/tests/bils_test/literal_test" method="post">
+<label>Name of Model & Path of Model</label><br/>
+<input type="text" name="model_name"
+value="<?php if(isset($model_name))echo $model_name; ?>"
+<br/>
+<input type="text" name="model_path"
+value="<?php if(isset($model_path))echo $model_path; ?>"           
+       ><br/>
+<label>Function Name & Expected Return</label><br/>
+<input type="text" name="function_name"
+value="<?php if(isset($function_name))echo $function_name; ?>">                     
+<input type="text" name="exp_return_value"
+value="<?php if(isset($exp_return_value))echo $exp_return_value; ?>">            
+<br/><label>Argument 1&2</label><br/>
+<input type="text" name="arg1"
+value="<?php if(isset($arg1))echo $arg1; ?>"
+<br/>
+<input type="text" name="arg2"
+value="<?php if(isset($arg2))echo $arg2; ?>"
+       ><br/>
+<label>Argument 3&4</label><br/>
+<input type="text" name="arg3"
+value="<?php if(isset($arg3))echo $arg2; ?>"
+<br/>
+<input type="text" name="arg4"
+value="<?php if(isset($arg4))echo $arg2; ?>">
+       <br/>
+<input type="submit" value="Test.."><br/>
+</form>
+</div>
+</body>
+</html>
