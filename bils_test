@@ -1,0 +1,111 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+//tests/test_tags_tbl/test_no_of_tags_total
+class Bils_test extends CI_Controller {
+public function index(){
+if(file_exists("test_data.txt")){
+$d = file_get_contents('test_data.txt');
+$data=  unserialize($d);
+}else{$data="";}
+$this->load->view("test/bils_test_form",$data);
+$this->load->view("test/bils_test_form2",$data);
+$this->load->view("test/bils_test_form3",$data);
+}
+public function test(){
+}//function end
+public function validate_form(){
+$this->form_validation->set_rules('model_name', 'model_name', 'required|trim');
+$this->form_validation->set_rules('model_path', 'model_path', 'required|trim');
+$this->form_validation->set_rules('function_name', 'function_name', 'required|trim');
+$this->form_validation->set_rules('arg1', 'arg1', 'trim');
+$this->form_validation->set_rules('exp_return_value', 'exp_return_value', 'trim');
+
+if ($this->form_validation->run() == true)
+{
+return true;}else{return false;}
+}//func ends
+public function saveTestValuesToFile(){
+$data['model_name']= $_POST['model_name'];
+$data['model_path']=$_POST['model_path'];
+$data['function_name']=$_POST['function_name'];
+$data['arg1']=$_POST['arg1'];
+$data['arg2']=$_POST['arg2'];
+$data['arg3']=$_POST['arg3'];
+$data['arg4']=$_POST['arg4'];
+if(isset($_POST['exp_return_value'])){
+$data['exp_return_value']=$_POST['exp_return_value'];}
+$data = serialize($data);
+file_put_contents("test_data.txt" , $data);
+}
+//saveTestValuesToConfig()
+public function literal_test(){
+$form_ret = $this->validate_form();
+if($form_ret==false){throw new exception("Form validation failed");}
+extract($_POST);
+echo $this->saveTestValuesToFile();
+if(empty($test_name)){$test_name= "Test_".$function_name;}
+$this->load->model($model_path);
+$this->load->library('unit_test');
+//$this->unit->use_strict(TRUE);
+$ret_value = $this->$model_name->$function_name($arg1,$arg2,$arg3,$arg4);
+echo "<h1><u>$test_name</u></h1>";
+echo "Expected Value : : ".$exp_return_value."<br/>";
+if(is_array($ret_value)){echo "Return value is an array<br/><pre>";
+print_r($ret_value);
+echo "</pre>";}else{echo "Return Value  :  ".$ret_value."<br/>";}
+echo $this->unit->run($ret_value, $exp_return_value, $test_name,"Message");
+$href="http://localhost/orgever2/index.php/tests/bils_test/index";
+$link =  "<a href=\"$href\">Return</a>";
+echo "<br/>".$link;
+}//literal_test
+public function data_type_test(){
+//$exp_ret_data_type = "is_array";
+$form_ret = $this->validate_form();
+if($form_ret==false){throw new exception("Form validation failed");}
+extract($_POST);
+echo $this->saveTestValuesToFile();
+if(empty($test_name)){$test_name= "Test_".$function_name;}
+$this->load->model($model_path);
+$this->load->library('unit_test');
+$this->unit->use_strict(TRUE);
+$ret_value = $this->$model_name->$function_name($arg1,$arg2,$arg3,$arg4);
+echo "<h1><u>$test_name</u></h1>";
+//echo "Expected value ::  :".$ret_value;
+echo $this->unit->run($ret_value,$exp_ret_data_type , $test_name,"Message");
+$href="http://localhost/orgever2/index.php/tests/bils_test/index";
+$link =  "<a href=\"$href\">Return</a>";
+if(is_array($ret_value)){echo "Return value is an array<br/><pre>";
+print_r($ret_value);
+echo "</pre>";}else{echo "Return Value".$ret_value."<br/>";}
+echo "<br/>".$link;
+
+}//data_type_test
+public function DB_driven_test(){
+//$exp_ret_data_type = "is_array";
+$form_ret = $this->validate_form();
+if($form_ret==false){throw new exception("Form validation failed");}
+extract($_POST);
+$this->saveTestValuesToFile();
+if(empty($test_name)){$test_name= "Test_".$function_name;}
+//start a transaction
+$this->db->trans_start();
+$this->load->model($model_path);
+$this->load->library('unit_test');
+$this->unit->use_strict(TRUE);
+$ret_value = $this->$model_name->$function_name($arg1,$arg2,$arg3,$arg4);
+echo "<h1><u>$test_name</u></h1>";
+echo $this->unit->run($ret_value,$exp_ret_data_type , $test_name,"Message");
+//// rollaback id db_action not set or set to rolbk
+if(!isset($db_action)||$db_action=="rollback"){
+ $this->db->trans_rollback();
+}else{$this->db->trans_commit();}
+//transaction complete
+$this->db->trans_complete();
+$href="http://localhost/orgever2/index.php/tests/bils_test/index";
+$link =  "<a href=\"$href\">Return</a>";
+if(is_array($ret_value)){echo "Return value is an array<br/><pre>";
+print_r($ret_value);
+echo "</pre>";}else{echo "Return Value".$ret_value."<br/>";}
+echo "<br/>".$link;
+}//db test
+////////////////////
+}//end of class
